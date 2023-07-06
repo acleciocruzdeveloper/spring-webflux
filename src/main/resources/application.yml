@@ -1,4 +1,7 @@
 spring:
   data:
     mongodb:
-      uri: mongodb+srv://engacleciocruz:<password>@webfluxclustercourse.hafw3pf.mongodb.net/course-webflux?retryWrites=true&w=majority
+      uri: mongodb+srv://${DB_USER}:${DB_PASSWORD}@webfluxclustercourse.hafw3pf.mongodb.net/${DB_NAME:course-webflux}?retryWrites=true&w=majority
+      auto-index-creation: true
+  application:
+    name: course-webflux
