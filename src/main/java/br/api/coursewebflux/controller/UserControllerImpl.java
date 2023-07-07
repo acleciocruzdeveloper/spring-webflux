@@ -1,5 +1,6 @@
 package br.api.coursewebflux.controller;
 
+import br.api.coursewebflux.mapper.UserMapper;
 import br.api.coursewebflux.model.request.UserRequest;
 import br.api.coursewebflux.model.response.UserResponse;
 import br.api.coursewebflux.service.UserService;
@@ -16,6 +17,7 @@ import reactor.core.publisher.Mono;
 @RequestMapping(value = "/users")
 public class UserControllerImpl implements UserController {
     private final UserService service;
+    private final UserMapper mapper;
 
     @Override
     public ResponseEntity<Mono<Void>> save(final UserRequest request) {
@@ -24,8 +26,9 @@ public class UserControllerImpl implements UserController {
     }
 
     @Override
-    public ResponseEntity<Mono<UserResponse>> find(String id) {
-        return null;
+    public ResponseEntity<Mono<UserResponse>> findById(String id) {
+        return ResponseEntity.ok().body(service.findById(id)
+                .map(mapper::toResponse));
     }
 
     @Override
