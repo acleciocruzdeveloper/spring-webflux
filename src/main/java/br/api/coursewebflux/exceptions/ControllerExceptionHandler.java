@@ -1,6 +1,7 @@
 package br.api.coursewebflux.exceptions;
 
 import br.api.coursewebflux.core.ExceptionsHandlerCore;
+import br.api.coursewebflux.service.exception.ObjectNotFoundExceptions;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -12,6 +13,7 @@ import reactor.core.publisher.Mono;
 
 import static java.time.LocalDateTime.now;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @ControllerAdvice
 public class ControllerExceptionHandler implements ExceptionsHandlerCore {
@@ -49,6 +51,22 @@ public class ControllerExceptionHandler implements ExceptionsHandlerCore {
 
         }
         return ResponseEntity.status(BAD_REQUEST).body(Mono.just(error));
+
+    }
+
+    @ExceptionHandler(ObjectNotFoundExceptions.class)
+    ResponseEntity<Mono<StandardError>> objectNotFoundException(
+            ObjectNotFoundExceptions e, ServerHttpRequest request
+    ) {
+        return ResponseEntity.status(NOT_FOUND)
+                .body(Mono.just(StandardError.builder()
+                        .timesTamp(now())
+                        .path(request.getPath().toString())
+                        .status(NOT_FOUND.value())
+                        .error(NOT_FOUND.getReasonPhrase())
+                        .message(e.getMessage())
+                        .build()));
+
 
     }
 
