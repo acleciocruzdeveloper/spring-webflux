@@ -41,7 +41,9 @@ public class UserControllerImpl implements UserController {
 
     @Override
     public ResponseEntity<Mono<UserResponse>> update(String id, UserRequest request) {
-        return null;
+        return ResponseEntity.ok().body(
+                service.updateUser(id, request).map(mapper::toResponse)
+        );
     }
 
     @Override
