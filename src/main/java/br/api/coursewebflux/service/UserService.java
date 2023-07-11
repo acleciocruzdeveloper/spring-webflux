@@ -38,7 +38,7 @@ public class UserService {
     }
 
     public Mono<User> deleteUser(final String id) {
-        return handleNotFound(repository.findById(id), id);
+        return handleNotFound(repository.findByIdAndRemove(id), id);
     }
 
     private <T> Mono<T> handleNotFound(Mono<T> mono, String id) {
