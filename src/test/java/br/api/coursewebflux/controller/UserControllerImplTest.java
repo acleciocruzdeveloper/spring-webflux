@@ -10,7 +10,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -123,7 +122,29 @@ class UserControllerImplTest {
     }
 
     @Test
-    void update() {
+    @DisplayName("should update user with success")
+    void shouldUpdateUserWithSuccess() {
+        UserRequest userRequest = new UserRequest(NAME, EMAIL, PASSWORD);
+        UserResponse userResponse = new UserResponse(ID, NAME, EMAIL, PASSWORD);
+
+        Mockito.when(service.updateUser(anyString(), any(UserRequest.class)))
+                .thenReturn(Mono.just(User.builder().build()));
+
+        Mockito.when(mapper.toResponse(any(User.class))).thenReturn(userResponse);
+
+        webTestClient.put().uri(BASE_URI + "/" + ID)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(userRequest))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.id").isEqualTo(ID)
+                .jsonPath("$.name").isEqualTo(NAME)
+                .jsonPath("$.email").isEqualTo(EMAIL)
+                .jsonPath("$.password").isEqualTo(PASSWORD);
+
+        Mockito.verify(service).updateUser(ID, userRequest);
+
     }
 
     @Test
