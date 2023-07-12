@@ -4,6 +4,8 @@ import br.api.coursewebflux.entity.User;
 import br.api.coursewebflux.mapper.UserMapper;
 import br.api.coursewebflux.model.request.UserRequest;
 import br.api.coursewebflux.repositories.UserRepository;
+import br.api.coursewebflux.service.exception.ObjectNotFoundExceptions;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -52,7 +54,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("deve retornar um usuario ao passar o id")
-    public void shouldFindByIdUser(){
+    public void shouldFindByIdUser() {
         Mockito.when(repository.findById(anyString())).thenReturn(Mono.just(User.builder().build()));
 
         Mono<User> response = service.findById("123");
@@ -66,7 +68,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("deve buscar um lista com os usuarios cadastrados")
-    public void shouldFindAllUserRepository(){
+    public void shouldFindAllUserRepository() {
 
         Mockito.when(repository.findAll()).thenReturn(Flux.just(User.builder().build()));
 
@@ -93,14 +95,14 @@ class UserServiceTest {
         Mono<User> response = service.updateUser("123", request);
 
         StepVerifier.create(response)
-                .expectNextMatches(u ->  u.getClass() == User.class)
+                .expectNextMatches(u -> u.getClass() == User.class)
                 .expectComplete()
                 .verify();
     }
 
     @Test
     @DisplayName("deve deletar um user do repository ao passar um id valido")
-    public void shouldDeleteUserWithIdValid(){
+    public void shouldDeleteUserWithIdValid() {
         User entity = User.builder().build();
 
         Mockito.when(repository.findByIdAndRemove(anyString())).thenReturn(Mono.just(entity));
@@ -113,6 +115,19 @@ class UserServiceTest {
                 .verify();
 
         verify(repository, times(1)).findByIdAndRemove(anyString());
+    }
+
+    @Test
+    @DisplayName("deve lancar exceptionHandle ao nao localizar id")
+    public void shouldExceptionHandleNotFound() {
+        Mockito.when(repository.findById(anyString())).thenReturn(Mono.just(User.builder().build()));
+
+        try {
+            service.findById("123").block();
+        } catch (ObjectNotFoundExceptions e) {
+            Assertions.assertEquals(ObjectNotFoundExceptions.class, e.getClass());
+            Assertions.assertEquals("Object Not Found id: %s, Type: %s", "123", e.getMessage());
+        }
     }
 
 }
