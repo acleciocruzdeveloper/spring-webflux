@@ -148,6 +148,16 @@ class UserControllerImplTest {
     }
 
     @Test
-    void delete() {
+    @DisplayName("should delete user success with id valid")
+    void shouldDeleteUserWithSuccess() {
+
+        Mockito.when(service.deleteUser(anyString())).thenReturn(Mono.just(User.builder().build()));
+
+        webTestClient.delete().uri(BASE_URI + "/" + ID)
+                .exchange()
+                .expectStatus().isNoContent();
+
+        Mockito.verify(service).deleteUser(ID);
+
     }
 }
